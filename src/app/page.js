@@ -1,6 +1,7 @@
 import FeaturesSection from "@/components/ui/features-service";
 import HeroSection from "@/components/ui/HeroSection";
 import HowItWorks from "@/components/ui/howtoworks";
+import TopEarners from "@/components/ui/topEarners";
 
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
       <HeroSection></HeroSection>
       <FeaturesSection></FeaturesSection>
       <HowItWorks></HowItWorks>
+      <TopEarners></TopEarners>
      
     </div>
   );
