@@ -1,3 +1,5 @@
+
+
 import { Facebook, Twitter, Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
@@ -16,10 +18,10 @@ const Footer = () => {
               The world's leading micro-task platform. We connect businesses with a global workforce to complete small tasks quickly and efficiently.
             </p>
             <div className="flex gap-4">
-              <Link href="#" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Facebook size={18}/></Link>
+              <Link href="https://www.facebook.com/mahfuzahmedony" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Facebook size={18}/></Link>
               <Link href="#" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Twitter size={18}/></Link>
-              <Link href="#" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Linkedin size={18}/></Link>
-              <Link href="#" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Github size={18}/></Link>
+              <Link href="https://www.linkedin.com/in/mahfuzahmedony/" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Linkedin size={18}/></Link>
+              <Link href="https://github.com/mdMahfuzAhmedony" className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:text-primary dark:hover:text-primary transition-all"><Github size={18}/></Link>
             </div>
           </div>
 
@@ -28,8 +30,9 @@ const Footer = () => {
             <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-6">For Workers</h3>
             <ul className="space-y-3 text-sm font-medium text-slate-600 dark:text-slate-400">
               <li><Link href="/tasks" className="hover:text-primary dark:hover:text-white transition-colors">Browse Tasks</Link></li>
-              <li><Link href="/leaderboard" className="hover:text-primary dark:hover:text-white transition-colors">Top Earners</Link></li>
-              <li><Link href="/how-it-works" className="hover:text-primary dark:hover:text-white transition-colors">How to Earn</Link></li>
+              <li><Link href="/top-earners" className="hover:text-primary dark:hover:text-white transition-colors">Top Earners</Link></li>
+              
+              <li><Link href="/how-to-earn" className="hover:text-primary dark:hover:text-white transition-colors">How to Earn</Link></li>
               <li><Link href="/withdraw" className="hover:text-primary dark:hover:text-white transition-colors">Withdraw Funds</Link></li>
             </ul>
           </div>
@@ -38,7 +41,7 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-6">For Buyers</h3>
             <ul className="space-y-3 text-sm font-medium text-slate-600 dark:text-slate-400">
-              <li><Link href="/post-task" className="hover:text-primary dark:hover:text-white transition-colors">Post a Task</Link></li>
+              <li><Link href="/post-a-task" className="hover:text-primary dark:hover:text-white transition-colors">Post a Task</Link></li>
               <li><Link href="/pricing" className="hover:text-primary dark:hover:text-white transition-colors">Pricing Plans</Link></li>
               <li><Link href="/buy-coins" className="hover:text-primary dark:hover:text-white transition-colors">Buy Coins</Link></li>
               <li><Link href="/advertise" className="hover:text-primary dark:hover:text-white transition-colors">Advertise</Link></li>
@@ -53,13 +56,13 @@ const Footer = () => {
                 <div className="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
                   <Mail size={16}/>
                 </div>
-                <span>support@microtask.com</span>
+                <span>mdmahfuzahmedony@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 group">
                 <div className="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
                   <MapPin size={16}/>
                 </div>
-                <span>Dhaka, Bangladesh</span>
+                <span>Jessore , Bangladesh</span>
               </li>
             </ul>
           </div>
@@ -68,7 +71,7 @@ const Footer = () => {
 
         {/* নিচের অংশ - কপিরাইট */}
         <div className="border-t border-slate-200 dark:border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-widest">
-          <p>© {new Date().getFullYear()} MicroTask Platform. Built with ❤️</p>
+          <p>© {new Date().getFullYear()} MicroTask Platform. Built with <span className=" text-blue-500"><a href="https://mahfuzahmedony.vercel.app/">Mahfuz Ahmed</a></span>❤️</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>

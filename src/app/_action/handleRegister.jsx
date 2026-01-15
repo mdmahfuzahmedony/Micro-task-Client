@@ -9,8 +9,12 @@ export async function handleRegister(formData) {
 
     const userInfo = { name, email, password, role, balance: 0, createdAt: new Date() };
 
+    console.log("Next.js থেকে পাঠানো হচ্ছে:", { name, email, role }); // এই লাইনটি যোগ করুন
+
+
+
     try {
-        const res = await fetch('http://localhost:3000/users', {
+        const res = await fetch('http://localhost:5000/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userInfo),
@@ -29,4 +33,3 @@ export async function handleRegister(formData) {
     } catch (err) {
         redirect("/register?error=Backend server is not running!");
     }
-}
