@@ -3,15 +3,15 @@ import { ArrowRight, Sparkles, Target } from 'lucide-react';
 
 const HeroSection = () => {
     return (
-        <section className="relative w-full bg-white dark:bg-slate-950 overflow-hidden transition-colors duration-300">
+        <section className="relative border  w-full bg-red-50 dark:bg-slate-950  overflow-hidden transition-colors duration-300">
             {/* Background Decorative Elements - ডার্ক মোডে সুন্দর আভা দিবে */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
+            <div className="absolute border top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 dark:bg-blue-600/10 blur-[120px] rounded-full"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-400/10 dark:bg-purple-600/10 blur-[120px] rounded-full"></div>
             </div>
 
             {/* Container with Max-width 1600px */}
-            <div className="max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12 relative z-10">
+            <div className="max-w-[1600px] mx-auto border py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12 relative z-10">
 
                 {/* Text Content */}
                 <div className="flex-1 text-center lg:text-left space-y-8">

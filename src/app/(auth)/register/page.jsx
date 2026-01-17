@@ -21,6 +21,7 @@ export default function RegisterPage() {
     };
 
     // ২. ইমেইল দিয়ে রেজিস্ট্রেশন করার ফাংশন
+    // ২. ইমেইল দিয়ে রেজিস্ট্রেশন করার ফাংশন
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
@@ -31,11 +32,13 @@ export default function RegisterPage() {
         const userInfo = {
             name,
             email,
-            password, // নোট: প্রোডাকশনে পাসওয়ার্ড হ্যাশ করা উচিত
+            password,
             role: selectedRole,
-            balance: 0,
+            balance: selectedRole === "worker" ? 10 : 0, // উদাহরণ: নতুন ওয়ার্কারকে ১০ বোনাস দিলেন
             createdAt: new Date(),
         };
+
+        console.log("Sending to DB:", userInfo); // চেক করার জন্য
 
         try {
             const res = await fetch("http://localhost:5000/users", {
@@ -45,8 +48,10 @@ export default function RegisterPage() {
             });
 
             const data = await res.json();
+            console.log("Server Response:", data); // সার্ভার কি পাঠাচ্ছে তা কন্সোলে দেখুন
 
-            if (data.upsertedId || data.modifiedCount || data.matchedCount) {
+            // কন্ডিশনটি আপডেট করা হয়েছে: insertedId বা acknowledged চেক করুন
+            if (data.insertedId || data.acknowledged || data.upsertedId) {
                 Swal.fire({
                     title: "Registration Successful!",
                     text: "Your account has been created. Please log in.",
@@ -54,13 +59,13 @@ export default function RegisterPage() {
                     confirmButtonColor: "#4f46e5",
                 });
                 form.reset();
-                router.push("/login"); // লগইন পেজে পাঠিয়ে দিবে
+                router.push("/login");
             } else {
-                Swal.fire("Error", "Registration failed. Try again.", "error");
+                Swal.fire("Error", data.message || "Registration failed. Try again.", "error");
             }
         } catch (error) {
             console.error("Error:", error);
-            Swal.fire("Error", "Server is not responding.", "error");
+            Swal.fire("Error", "Server is not responding. Make sure Backend (Port 5000) is running.", "error");
         }
     };
 

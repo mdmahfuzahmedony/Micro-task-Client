@@ -1,6 +1,7 @@
 // src/auth.js
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import Credentials from "next-auth/providers/credentials" // এটি যোগ করতে হবে
 import { cookies } from "next/headers";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -9,7 +10,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
+        // ইমেইল-পাসওয়ার্ড লগইন চালু করার জন্য এটি অবশ্যই লাগবে
+        Credentials({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" }
+            },
+            async authorize(credentials) {
+                // এখানে আপনার ব্যাকএন্ড থেকে ইউজার ভেরিফাই করার কোড লিখুন
+                // উদাহরণ হিসেবে:
+                const res = await fetch("http://localhost:5000/login", {
+                    method: "POST",
+                    body: JSON.stringify(credentials),
+                    headers: { "Content-Type": "application/json" }
+                })
+                const user = await res.json()
+
+                if (res.ok && user) {
+                    return user // ইউজার পাওয়া গেলে রিটার্ন করুন
+                }
+                return null // না পাওয়া গেলে বা ভুল হলে null
+            }
+        })
     ],
+
+    // এটিই আপনাকে ডিফল্ট পেজে যাওয়া থেকে আটকাবে
+    pages: {
+        signIn: "/login",
+        error: "/login",
+    },
+
     callbacks: {
         async signIn({ user, account }) {
             if (account.provider === "google") {
@@ -36,18 +67,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return true;
         },
 
-        // --- এই দুটি কলব্যাক না থাকলে Navbar এ রোল পরিবর্তন হবে না ---
-
         async jwt({ token, user }) {
-            // যখন ইউজার লগইন থাকবে, আমরা ডাটাবেজ থেকে তার ডাটা নিয়ে আসবো
             if (token?.email) {
                 try {
-                    // আপনার সার্ভার থেকে রোলটি নিয়ে আসা
                     const res = await fetch(`http://localhost:5000/users/${token.email}`);
-                    const dbUser = await res.json();
-
-                    if (dbUser) {
-                        token.role = dbUser.role; // ডাটাবেজের রোল টোকেনে সেট করলাম
+                    if (res.ok) {
+                        const dbUser = await res.json();
+                        if (dbUser) {
+                            token.role = dbUser.role;
+                        }
                     }
                 } catch (error) {
                     console.error("JWT Error:", error);
@@ -57,11 +85,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
 
         async session({ session, token }) {
-            // টোকেন থেকে রোলটি নিয়ে সেশনে পাঠানো
             if (token?.role) {
                 session.user.role = token.role;
             }
             return session;
         }
     },
+    // সিকিউরিটির জন্য এটি যোগ করা ভালো
+    secret: process.env.AUTH_SECRET,
 })

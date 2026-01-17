@@ -1,116 +1,184 @@
 "use client";
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Link from 'next/link';
+import TaskCard from '@/components/ui/TaskCard'; // আপনার তৈরি করা সেই নতুন কার্ডটি
+import { Search, Filter, SortAsc, RefreshCcw, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 
 const TaskList = () => {
-    // ডাটাবেস থেকে আসা ডামি ডাটা (Mock Data)
-    const allTasks = [
-        {
-            id: "101",
-            task_title: "Watch YouTube Video for 2 Mins",
-            buyer_name: "John Doe",
-            completion_date: "2023-12-30",
-            payable_amount: 50,
-            required_workers: 15
-        },
-        {
-            id: "102",
-            task_title: "Facebook Page Like & Share",
-            buyer_name: "Sumaiya Khan",
-            completion_date: "2023-11-25",
-            payable_amount: 30,
-            required_workers: 0, // এটি দেখাবে না কারণ worker 0
-        },
-        {
-            id: "103",
-            task_title: "Install and Review 'SafeApp'",
-            buyer_name: "Tech Pro Ltd",
-            completion_date: "2023-11-20",
-            payable_amount: 200,
-            required_workers: 5
-        },
-        {
-            id: "104",
-            task_title: "Join Telegram Group",
-            buyer_name: "Crypto Hub",
-            completion_date: "2023-12-05",
-            payable_amount: 20,
-            required_workers: 100
-        }
-    ];
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filterCategory, setFilterCategory] = useState('');
+    const [sortBy, setSortBy] = useState('');
 
-    // ফিল্টার: শুধুমাত্র যাদের required_worker > 0 তাদের দেখাবে
-    const availableTasks = allTasks.filter(task => task.required_workers > 0);
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6; // প্রতি পেজে ৬টি করে টাস্ক দেখাবে
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                setLoading(true);
+                // আপনার API URL এখানে বসাবেন
+                const res = await axios.get('http://localhost:5000/all-tasks');
+                // শুধুমাত্র যাদের required_workers > 0 তাদের ফিল্টার করে রাখা ভালো
+                const available = res.data.filter(task => task.required_workers > 0);
+                setTasks(available);
+            } catch (err) {
+                console.error("Error fetching tasks:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTasks();
+    }, []);
+
+    // filtering and sorting logic
+    const filteredTasks = tasks
+        .filter(task => filterCategory ? task.task_title.toLowerCase().includes(filterCategory.toLowerCase()) : true)
+        .sort((a, b) => {
+            if (sortBy === 'low-to-high') return a.payable_amount - b.payable_amount;
+            if (sortBy === 'high-to-low') return b.payable_amount - a.payable_amount;
+            return 0;
+        });
+
+    // Pagination Calculations
+    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedTasks = filteredTasks.slice(startIndex, startIndex + itemsPerPage);
+
+    // Filter পরিবর্তন হলে পেজ ১-এ নিয়ে যাওয়া
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterCategory, sortBy]);
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700">
-            {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+
+            {/* --- TOP SECTION: Header & Stats --- */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Available Tasks</h1>
-                    <p className="text-sm text-slate-500 font-sans">Find and complete tasks to earn coins instantly.</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+                        <Layers className="text-blue-600" /> Available Tasks
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                        Complete micro-tasks and grow your coin balance.
+                    </p>
                 </div>
-                <div className="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-                    <span className="text-blue-600 font-bold">{availableTasks.length}</span>
-                    <span className="text-blue-600 text-sm ml-1 font-sans">Tasks Found</span>
+                <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-5 py-3 rounded-2xl border border-blue-100 dark:border-blue-800">
+                    <span className="text-blue-600 font-black text-xl leading-none">{filteredTasks.length}</span>
+                    <span className="text-blue-600/70 text-sm font-bold uppercase tracking-wider">Tasks Ready</span>
                 </div>
             </div>
 
-            {/* Task Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {availableTasks.length > 0 ? (
-                    availableTasks.map((task) => (
-                        <div
-                            key={task.id}
-                            className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group"
+            {/* --- MIDDLE SECTION: Filters & Sorting (Horizontal Bar) --- */}
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-8 flex flex-wrap items-center gap-4">
+
+                {/* Category Selector */}
+                <div className="flex-grow min-w-[200px]">
+                    <div className="relative">
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <select
+                            className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            value={filterCategory}
                         >
-                            {/* Task Title */}
-                            <h3 className="text-lg font-bold text-slate-800 line-clamp-2 min-h-[56px] group-hover:text-blue-600 transition-colors">
-                                {task.task_title}
-                            </h3>
-
-                            {/* Task Info List */}
-                            <div className="mt-4 space-y-3">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500 font-sans">Buyer:</span>
-                                    <span className="text-slate-800 font-semibold">{task.buyer_name}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500 font-sans">Deadline:</span>
-                                    <span className="text-slate-800 font-medium">{task.completion_date}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500 font-sans">Required Workers:</span>
-                                    <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold">
-                                        {task.required_workers} Left
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Bottom Section: Amount & Action */}
-                            <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Payable</p>
-                                    <p className="text-xl font-black text-green-600">🪙 {task.payable_amount}</p>
-                                </div>
-
-                                {/* View Details Button */}
-                                <Link href={`/dashboard/task-list/${task.id}`}>
-                                    <button className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 font-sans">
-                                        View Details
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-20 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                        <span className="text-4xl">🔍</span>
-                        <h3 className="text-lg font-bold text-slate-600 mt-4 font-sans">No tasks available right now.</h3>
-                        <p className="text-slate-400 text-sm font-sans">Please check back later for new opportunities.</p>
+                            <option value="">All Categories</option>
+                            <option value="YouTube">YouTube Tasks</option>
+                            <option value="Facebook">Facebook Tasks</option>
+                            <option value="Survey">Surveys</option>
+                            <option value="App">App Installs</option>
+                        </select>
                     </div>
-                )}
+                </div>
+
+                {/* Sort Selector */}
+                <div className="flex-grow md:flex-grow-0 min-w-[180px]">
+                    <div className="relative">
+                        <SortAsc className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <select
+                            className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={(e) => setSortBy(e.target.value)}
+                            value={sortBy}
+                        >
+                            <option value="">Sort By Price</option>
+                            <option value="high-to-low">High Reward</option>
+                            <option value="low-to-high">Low Reward</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Reset Button */}
+                <button
+                    onClick={() => { setFilterCategory(''); setSortBy(''); }}
+                    className="p-3 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 rounded-xl transition-colors"
+                    title="Reset Filters"
+                >
+                    <RefreshCcw size={20} />
+                </button>
             </div>
+
+            {/* --- BOTTOM SECTION: Task List Grid --- */}
+            {loading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="mt-4 font-bold text-slate-400 uppercase tracking-widest text-xs">Fetching Tasks...</p>
+                </div>
+            ) : paginatedTasks.length > 0 ? (
+                <div className="space-y-8">
+                    {/* টাস্কগুলোকে নিচে নিচে দেখানোর জন্য এক কলামের গ্রিড */}
+                    <div className="grid grid-cols-2 gap-6">
+                        {paginatedTasks.map((task) => (
+                            <Link key={task.id || task._id} href={`/dashboard/task-list/${task.id || task._id}`}>
+                                <TaskCard task={task} />
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-3 pt-6">
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(prev => prev - 1)}
+                                className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 disabled:opacity-30 hover:bg-blue-50 transition-all"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                                {[...Array(totalPages)].map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setCurrentPage(idx + 1)}
+                                        className={`w-10 h-10 rounded-lg font-bold text-sm transition-all ${currentPage === idx + 1
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 hover:border-blue-300'
+                                            }`}
+                                    >
+                                        {idx + 1}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                                className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 disabled:opacity-30 hover:bg-blue-50 transition-all"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800 shadow-inner">
+                    <div className="text-5xl mb-4">🏜️</div>
+                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300">No Tasks Found</h3>
+                    <p className="text-slate-400 mt-2">Try changing your filters or category.</p>
+                </div>
+            )}
         </div>
     );
 };

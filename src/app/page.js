@@ -1,3 +1,4 @@
+import FAQSection from "@/components/ui/FAQ";
 import FeaturesSection from "@/components/ui/features-service";
 import HeroSection from "@/components/ui/HeroSection";
 import HowItWorks from "@/components/ui/howtoworks";
@@ -11,6 +12,7 @@ export default function Home() {
       <FeaturesSection></FeaturesSection>
       <HowItWorks></HowItWorks>
       <TopEarners></TopEarners>
+      <FAQSection></FAQSection>
      
     </div>
   );

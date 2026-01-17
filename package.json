@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.6.1",
     "axios": "^1.13.2",
     "daisyui": "^5.5.14",
     "js-cookie": "^3.0.5",
@@ -17,6 +19,7 @@
     "next-auth": "^5.0.0-beta.30",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-icons": "^5.5.0",
     "react-router": "^7.12.0",
     "sweetalert2": "^11.26.17"
   },
