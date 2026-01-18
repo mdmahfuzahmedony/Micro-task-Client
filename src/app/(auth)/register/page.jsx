@@ -22,7 +22,7 @@ export default function RegisterPage() {
 
   // ২. ইমেইল দিয়ে রেজিস্ট্রেশন করার ফাংশন
   // ২. ইমেইল দিয়ে রেজিস্ট্রেশন করার ফাংশন
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
@@ -34,11 +34,9 @@ export default function RegisterPage() {
       email,
       password,
       role: selectedRole,
-      balance: selectedRole === "worker" ? 10 : 0, // উদাহরণ: নতুন ওয়ার্কারকে ১০ বোনাস দিলেন
+      balance: selectedRole === "worker" ? 10 : 0,
       createdAt: new Date(),
     };
-
-    console.log("Sending to DB:", userInfo); // চেক করার জন্য
 
     try {
       const res = await fetch(
@@ -51,9 +49,7 @@ export default function RegisterPage() {
       );
 
       const data = await res.json();
-      console.log("Server Response:", data); // সার্ভার কি পাঠাচ্ছে তা কন্সোলে দেখুন
 
-      // কন্ডিশনটি আপডেট করা হয়েছে: insertedId বা acknowledged চেক করুন
       if (data.insertedId || data.acknowledged || data.upsertedId) {
         Swal.fire({
           title: "Registration Successful!",
@@ -71,10 +67,11 @@ export default function RegisterPage() {
         );
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Full Error:", error);
+      // এখানে এখন আর Port 5000 দেখাবে না, আসল এরর মেসেজ দেখাবে
       Swal.fire(
-        "Error",
-        "Server is not responding. Make sure Backend (Port 5000) is running.",
+        "Network Error",
+        "Could not connect to the server. Please check your internet or server logs.",
         "error"
       );
     }
