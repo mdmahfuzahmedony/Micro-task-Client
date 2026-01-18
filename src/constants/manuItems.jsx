@@ -14,7 +14,7 @@ export const menuItems = {
         { name: "Payment History", path: "/dashboard/payment-history", icon: "📜" },
     ],
     admin: [
-        { name: "Home", path: "/dashboard", icon: "🏠" },
+        { name: "Home", path: "/dashboard/statas", icon: "🏠" },
         { name: "Manage Users", path: "/dashboard/users", icon: "👥" },
         { name: "Manage Tasks", path: "/dashboard/tasks", icon: "🛠️" },
     ],

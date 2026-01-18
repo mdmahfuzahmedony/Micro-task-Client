@@ -42,7 +42,7 @@ export default function RegisterPage() {
 
     try {
       const res = await fetch(
-        "https://micro-task-server-nine.vercel.appusers",
+        "https://micro-task-server-nine.vercel.app/users",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

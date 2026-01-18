@@ -13,7 +13,7 @@ const Leaderboard = () => {
     // এখানে তোমার ইউজার লিস্ট এপিআই কল হবে
     // ইউজারদের অবশ্যই 'balance' অনুযায়ী সর্ট করে আনতে হবে
     axios
-      .get("https://micro-task-server-nine.vercel.appusers")
+      .get("https://micro-task-server-nine.vercel.app/users")
       .then((res) => {
         // সর্ট করা ব্যালেন্স অনুযায়ী (বড় থেকে ছোট)
         const sortedUsers = res.data.sort((a, b) => b.balance - a.balance);

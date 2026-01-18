@@ -31,7 +31,7 @@ export const {
             async authorize(credentials) {
                 // এখানে আপনার ব্যাকএন্ড থেকে ইউজার ভেরিফাই করার কোড লিখুন
                 // উদাহরণ হিসেবে:
-                const res = await fetch("https://micro-task-server-nine.vercel.applogin", {
+                const res = await fetch("https://micro-task-server-nine.vercel.app/login", {
                     method: "POST",
                     body: JSON.stringify(credentials),
                     headers: {
@@ -61,7 +61,7 @@ export const {
         }) {
             if (account.provider === "google") {
                 const cookieStore = await cookies();
-                const selectedRole = cookieStore.get("user_role") ? .value || "worker";
+                const selectedRole = cookieStore.get("user_role") ?.value || "worker";
 
                 const userInfo = {
                     name: user.name,
@@ -71,7 +71,7 @@ export const {
                 };
 
                 try {
-                    await fetch("https://micro-task-server-nine.vercel.appusers", {
+                    await fetch("https://micro-task-server-nine.vercel.app/users", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -89,9 +89,9 @@ export const {
             token,
             user
         }) {
-            if (token ? .email) {
+            if (token ?.email) {
                 try {
-                    const res = await fetch(`https://micro-task-server-nine.vercel.appusers/${token.email}`);
+                    const res = await fetch(`https://micro-task-server-nine.vercel.app/users/${token.email}`);
                     if (res.ok) {
                         const dbUser = await res.json();
                         if (dbUser) {
@@ -109,7 +109,7 @@ export const {
             session,
             token
         }) {
-            if (token ? .role) {
+            if (token ?.role) {
                 session.user.role = token.role;
             }
             return session;
