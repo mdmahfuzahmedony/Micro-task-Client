@@ -43,7 +43,7 @@ const FeaturesSection = () => {
 
     return (
         <section className="w-full py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-300">
-            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 border">
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 ">
 
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">

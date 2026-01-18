@@ -21,7 +21,7 @@ const TopEarners = () => {
 
     return (
         <section className="py-24 bg-slate-50 dark:bg-slate-900/30 transition-colors duration-300">
-            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 border">
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 ">
 
                 {/* Section Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">

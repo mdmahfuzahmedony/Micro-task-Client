@@ -27,7 +27,7 @@ const FAQSection = () => {
 
     return (
         <section className="py-10 bg-white dark:bg-slate-950 transition-colors duration-300">
-            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 border">
+            <div className="max-w-[1600px] mx-auto px-6 lg:px-0 ">
 
                 <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
 

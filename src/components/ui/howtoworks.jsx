@@ -28,7 +28,7 @@ const HowItWorks = () => {
 
     return (
         <section className="py-10 bg-white dark:bg-slate-950 transition-colors duration-300">
-            <div className="max-w-[1600px] border mx-auto px-6 lg:px-0">
+            <div className="max-w-[1600px]  mx-auto px-6 lg:px-0">
 
                 {/* Header Part */}
                 <div className="text-center max-w-2xl mx-auto mb-20">
