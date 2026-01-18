@@ -13,7 +13,7 @@ const PaymentHistory = () => {
     if (session?.user?.email) {
       axios
         .get(
-          `https://micro-task-server-nine.vercel.apppayment-history/${session?.user?.email}`
+          `https://micro-task-server-nine.vercel.app/payment-history/${session?.user?.email}`
         )
         .then((res) => {
           setPayments(res.data);

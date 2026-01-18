@@ -18,7 +18,7 @@ const ReviewTask = () => {
 
   const fetchSubmissions = async () => {
     const res = await axios.get(
-      `https://micro-task-server-nine.vercel.apppending-submissions/${session.user.email}`
+      `https://micro-task-server-nine.vercel.app/pending-submissions/${session.user.email}`
     );
     setSubmissions(res.data);
   };

@@ -14,7 +14,7 @@ const Header = () => {
       const fetchUserData = async () => {
         try {
           const res = await axios.get(
-            `https://micro-task-server-nine.vercel.appusers/${session.user.email}`
+            `https://micro-task-server-nine.vercel.app/users/${session.user.email}`
           );
           setDbUser(res.data);
         } catch (error) {
