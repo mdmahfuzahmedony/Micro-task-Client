@@ -1,8 +1,7 @@
-// src/auth.js
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials" // এটি যোগ করতে হবে
-
+import Credentials from "next-auth/providers/credentials"
+import { cookies } from "next-auth/next" // এটি প্রয়োজন কুকি এক্সেস করতে
 
 export const {
     handlers,
@@ -13,55 +12,40 @@ export const {
     providers: [
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET, // আপনার ভেরসেলের নামের সাথে এটি মিল থাকতে হবে
         }),
-        // ইমেইল-পাসওয়ার্ড লগইন চালু করার জন্য এটি অবশ্যই লাগবে
         Credentials({
             name: "Credentials",
             credentials: {
-                email: {
-                    label: "Email",
-                    type: "email"
-                },
-                password: {
-                    label: "Password",
-                    type: "password"
-                }
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                // এখানে আপনার ব্যাকএন্ড থেকে ইউজার ভেরিফাই করার কোড লিখুন
-                // উদাহরণ হিসেবে:
                 const res = await fetch("https://micro-task-server-nine.vercel.app/login", {
                     method: "POST",
                     body: JSON.stringify(credentials),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 })
                 const user = await res.json()
-
                 if (res.ok && user) {
-                    return user // ইউজার পাওয়া গেলে রিটার্ন করুন
+                    return user
                 }
-                return null // না পাওয়া গেলে বা ভুল হলে null
+                return null
             }
         })
     ],
 
-    // এটিই আপনাকে ডিফল্ট পেজে যাওয়া থেকে আটকাবে
     pages: {
         signIn: "/login",
         error: "/login",
     },
 
     callbacks: {
-        async signIn({
-            user,
-            account
-        }) {
+        async signIn({ user, account }) {
             if (account.provider === "google") {
-                const cookieStore = await cookies();
-                const selectedRole = cookieStore.get("user_role") ?.value || "worker";
+                // কুকি থেকে রোল নেওয়া
+                const cookieStore = cookies();
+                const selectedRole = cookieStore.get("user_role")?.value || "worker";
 
                 const userInfo = {
                     name: user.name,
@@ -73,9 +57,7 @@ export const {
                 try {
                     await fetch("https://micro-task-server-nine.vercel.app/users", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(userInfo),
                     });
                 } catch (error) {
@@ -85,11 +67,8 @@ export const {
             return true;
         },
 
-        async jwt({
-            token,
-            user
-        }) {
-            if (token ?.email) {
+        async jwt({ token, user }) {
+            if (token?.email) {
                 try {
                     const res = await fetch(`https://micro-task-server-nine.vercel.app/users/${token.email}`);
                     if (res.ok) {
@@ -105,16 +84,13 @@ export const {
             return token;
         },
 
-        async session({
-            session,
-            token
-        }) {
-            if (token ?.role) {
+        async session({ session, token }) {
+            if (token?.role) {
                 session.user.role = token.role;
             }
             return session;
         }
     },
-    // সিকিউরিটির জন্য এটি যোগ করা ভালো
-    secret: process.env.AUTH_SECRET,
+    // ভেরসেল সেটিংসে যে নাম দিয়েছেন ঠিক সেই নামটিই এখানে দিন
+    secret: process.env.NEXTAUTH_SECRET, 
 })
