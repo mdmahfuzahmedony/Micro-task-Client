@@ -2,7 +2,7 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials" // এটি যোগ করতে হবে
-import { cookies } from "next/headers";
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [

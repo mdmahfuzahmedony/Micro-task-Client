@@ -1,99 +1,188 @@
 "use client";
-import React, { useState } from 'react';
 
-const Withdrawals = () => {
-    const [withdrawCoins, setWithdrawCoins] = useState(0);
-    const currentBalance = 12450; // ডামি ব্যালেন্স
-    const coinToDollarRate = 20; // ২০ কয়েন = ১ ডলার (আপনার নোট অনুযায়ী)
+import React, { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react";
+import axios from 'axios';
+import { Coins, DollarSign, CreditCard, Send, AlertCircle, Loader2 } from 'lucide-react';
+import Swal from 'sweetalert2'; // মেসেজ দেখানোর জন্য
 
-    const withdrawalAmountInDollar = (withdrawCoins / coinToDollarRate).toFixed(2);
+const WithdrawalForm = () => {
+    const { data: session } = useSession();
+    const [userCoins, setUserCoins] = useState(0); // ডাটাবেস থেকে পাওয়া টোটাল কয়েন
+    const [loading, setLoading] = useState(true);
+
+    // Form States
+    const [withdrawCoin, setWithdrawCoin] = useState(0);
+    const [paymentSystem, setPaymentSystem] = useState('');
+    const [accountNumber, setAccountNumber] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // ১ ডলার = ২০ কয়েন (Worker Logic)
+    const COIN_TO_DOLLAR_RATE = 20;
+    const MIN_WITHDRAW_COIN = 200; // ১০ ডলার
+
+    // ডাটাবেস থেকে ইউজারের কারেন্ট কয়েন ফেচ করা
+    useEffect(() => {
+        if (session?.user?.email) {
+            axios.get(`http://localhost:5000/user-stats/${session.user.email}`)
+                .then(res => {
+                    setUserCoins(res.data.coins || 0);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error("Error fetching user stats:", err);
+                    setLoading(false);
+                });
+        }
+    }, [session?.user?.email]);
+
+    // অটোমেটিক ডলার ক্যালকুলেশন
+    const withdrawAmount = (withdrawCoin / COIN_TO_DOLLAR_RATE).toFixed(2);
+    const currentDollarValue = (userCoins / COIN_TO_DOLLAR_RATE).toFixed(2);
+
+    const handleWithdraw = async (e) => {
+        e.preventDefault();
+        
+        if (withdrawCoin < MIN_WITHDRAW_COIN) {
+            return Swal.fire("Error", "Minimum withdrawal is 200 coins ($10)", "error");
+        }
+        if (withdrawCoin > userCoins) {
+            return Swal.fire("Error", "You don't have enough coins!", "error");
+        }
+
+        setIsSubmitting(true);
+        const withdrawData = {
+            worker_email: session?.user?.email,
+            worker_name: session?.user?.name,
+            withdrawal_coin: parseInt(withdrawCoin),
+            withdrawal_amount: parseFloat(withdrawAmount),
+            payment_system: paymentSystem,
+            account_number: accountNumber,
+            withdraw_date: new Date(),
+            status: 'pending'
+        };
+
+        try {
+            const response = await axios.post('http://localhost:5000/withdrawals', withdrawData);
+            if (response.data.insertedId) {
+                Swal.fire("Success", "Withdrawal request sent successfully!", "success");
+                setUserCoins(prev => prev - withdrawCoin); // লোকাল স্টেট আপডেট
+                setWithdrawCoin(0);
+                setAccountNumber('');
+            }
+        } catch (error) {
+            Swal.fire("Error", "Something went wrong. Try again.", "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (loading) return <div className="flex justify-center py-10"><Loader2 className="animate-spin text-blue-500" /></div>;
 
     return (
-        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-700 font-sans">
+        <div className="max-w-4xl mx-auto p-6">
+            <h2 className="text-3xl font-black mb-6 text-slate-800">Withdraw Earnings</h2>
 
-            {/* Balance Summary Card */}
-            <div className="bg-gradient-to-br from-slate-900 to-blue-900 p-8 rounded-3xl text-white shadow-xl flex justify-between items-center">
-                <div>
-                    <p className="text-blue-200 text-sm font-medium">Available Balance</p>
-                    <h2 className="text-5xl font-black mt-2">🪙 {currentBalance}</h2>
-                    <p className="text-blue-300 text-xs mt-3 uppercase tracking-widest">
-                        ≈ ${(currentBalance / coinToDollarRate).toFixed(2)} USD
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                {/* Current Coin Card */}
+                <div className="bg-amber-500 text-white p-6 rounded-3xl shadow-lg flex items-center justify-between">
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-widest opacity-80">Total Coins</p>
+                        <h3 className="text-4xl font-black">{userCoins}</h3>
+                    </div>
+                    <Coins size={48} className="opacity-30" />
                 </div>
-                <div className="hidden md:block text-6xl opacity-20 italic font-black text-white">WITHDRAW</div>
+
+                {/* Current Dollar Card */}
+                <div className="bg-emerald-600 text-white p-6 rounded-3xl shadow-lg flex items-center justify-between">
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-widest opacity-80">Withdrawal Amount</p>
+                        <h3 className="text-4xl font-black">${currentDollarValue}</h3>
+                    </div>
+                    <DollarSign size={48} className="opacity-30" />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                {/* Withdrawal Form */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-fit">
-                    <h3 className="text-xl font-bold text-slate-800 mb-6">Request Withdrawal</h3>
-                    <form className="space-y-5">
+            {/* Withdrawal Form */}
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800">
+                <form onSubmit={handleWithdraw} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Coin to Withdraw */}
                         <div>
-                            <label className="text-sm text-slate-500 font-bold mb-2 block">Coins to Withdraw</label>
+                            <label className="block text-sm font-bold text-slate-500 mb-2">Coins to Withdraw</label>
                             <input
                                 type="number"
-                                onChange={(e) => setWithdrawCoins(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-lg"
-                                placeholder="Enter amount of coins"
+                                value={withdrawCoin}
+                                onChange={(e) => setWithdrawCoin(e.target.value)}
+                                min={0}
+                                max={userCoins}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-none ring-2 ring-transparent focus:ring-blue-500 transition-all font-bold"
+                                placeholder="Enter coin amount"
+                                required
                             />
-                            <p className="mt-2 text-xs text-blue-600 font-medium italic">
-                                You will receive: ${withdrawalAmountInDollar}
-                            </p>
                         </div>
 
+                        {/* Amount in Dollars (Read Only) */}
                         <div>
-                            <label className="text-sm text-slate-500 font-bold mb-2 block">Payment Method</label>
-                            <select className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
-                                <option>bKash (Personal)</option>
-                                <option>Nagad</option>
-                                <option>Rocket</option>
-                                <option>Binance (USDT)</option>
+                            <label className="block text-sm font-bold text-slate-500 mb-2">Withdraw Amount ($)</label>
+                            <div className="w-full p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl font-black text-emerald-600 text-lg flex items-center gap-2">
+                                <DollarSign size={18} /> {withdrawAmount}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Payment System */}
+                        <div>
+                            <label className="block text-sm font-bold text-slate-500 mb-2">Payment System</label>
+                            <select
+                                value={paymentSystem}
+                                onChange={(e) => setPaymentSystem(e.target.value)}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-none ring-2 ring-transparent focus:ring-blue-500 transition-all font-bold"
+                                required
+                            >
+                                <option value="">Select System</option>
+                                <option value="Stripe">Stripe</option>
+                                <option value="Bkash">Bkash</option>
+                                <option value="Nagad">Nagad</option>
+                                <option value="Rocket">Rocket</option>
                             </select>
                         </div>
 
+                        {/* Account Number */}
                         <div>
-                            <label className="text-sm text-slate-500 font-bold mb-2 block">Account/Wallet Number</label>
-                            <input type="text" className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl outline-none" placeholder="017XXXXXXXX / Wallet ID" />
+                            <label className="block text-sm font-bold text-slate-500 mb-2">Account Number / Email</label>
+                            <input
+                                type="text"
+                                value={accountNumber}
+                                onChange={(e) => setAccountNumber(e.target.value)}
+                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-none ring-2 ring-transparent focus:ring-blue-500 transition-all font-bold"
+                                placeholder="Enter number or email"
+                                required
+                            />
                         </div>
+                    </div>
 
+                    {/* Logic for Button visibility */}
+                    {userCoins >= MIN_WITHDRAW_COIN ? (
                         <button
-                            disabled={withdrawCoins < 100}
-                            className={`w-full py-4 rounded-2xl font-black text-white transition-all shadow-lg ${withdrawCoins >= 100 ? 'bg-slate-900 hover:bg-blue-600' : 'bg-slate-300 cursor-not-allowed'
-                                }`}
+                            type="submit"
+                            disabled={isSubmitting || withdrawCoin > userCoins || withdrawCoin <= 0}
+                            className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         >
-                            WITHDRAW NOW
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : <Send size={24} />}
+                            Withdraw Now
                         </button>
-                        <p className="text-[10px] text-center text-slate-400">Minimum withdrawal: 2000 Coins ($1.00)</p>
-                    </form>
-                </div>
-
-                {/* Info & Rules Card */}
-                <div className="bg-blue-50/50 p-8 rounded-2xl border border-blue-100 h-fit">
-                    <h3 className="text-lg font-bold text-blue-900 mb-4">Withdrawal Policy</h3>
-                    <ul className="space-y-4 text-sm text-blue-800/80 font-medium">
-                        <li className="flex gap-3">
-                            <span className="text-blue-500">📌</span>
-                            <span>Exchange Rate: <strong>{coinToDollarRate} Coins = $1.00 USD</strong>.</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <span className="text-blue-500">📌</span>
-                            <span>Withdrawals are processed within <strong>24 to 72 hours</strong>.</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <span className="text-blue-500">📌</span>
-                            <span>Double check your account number. Admin is not responsible for wrong numbers.</span>
-                        </li>
-                        <li className="flex gap-3 font-bold text-red-600">
-                            <span className="text-red-500">⚠️</span>
-                            <span>Any cheating attempt will result in account ban and forfeiture of coins.</span>
-                        </li>
-                    </ul>
-                </div>
-
+                    ) : (
+                        <div className="flex items-center gap-3 p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-2xl border border-rose-100 dark:border-rose-800 font-bold justify-center">
+                            <AlertCircle size={20} />
+                            Insufficient coins (Minimum 200 required)
+                        </div>
+                    )}
+                </form>
             </div>
         </div>
     );
 };
 
-export default Withdrawals;
+export default WithdrawalForm;
