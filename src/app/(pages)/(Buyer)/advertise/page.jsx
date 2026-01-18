@@ -10,7 +10,7 @@ const Advertise = () => {
                 <div className="grid md:grid-cols-2 gap-8 mt-12">
                     <div className="bg-[#112240] p-6 rounded-2xl border border-gray-800">
                         <h3 className="text-xl font-bold mb-2">Featured Task Slot</h3>
-                        <p className="text-gray-400 mb-4">Your task will stay at the top of the "Available Tasks" list for 24 hours.</p>
+                        <p className="text-gray-400 mb-4">Your task will stay at the top of the Available Task" list for 24 hours.</p>
                         <div className="text-2xl font-bold text-blue-400 mb-4">500 Coins / Day</div>
                         <button className="w-full border border-blue-500 text-blue-500 py-2 rounded-lg hover:bg-blue-500 hover:text-white transition">Book Slot</button>
                     </div>

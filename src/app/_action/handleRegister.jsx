@@ -14,7 +14,7 @@ export async function handleRegister(formData) {
 
 
     try {
-        const res = await fetch('http://localhost:5000/users', {
+        const res = await fetch('https://micro-task-server-nine.vercel.app/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userInfo),
@@ -33,3 +33,6 @@ export async function handleRegister(formData) {
     } catch (err) {
         redirect("/register?error=Backend server is not running!");
     }
+}
+
+
