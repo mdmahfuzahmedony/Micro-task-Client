@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
-import { cookies } from "next-auth/next" // এটি প্রয়োজন কুকি এক্সেস করতে
+import { cookies } from "next/headers" // এটি পরিবর্তন করা হয়েছে (next/headers থেকে আসবে)
 
 export const {
     handlers,
@@ -12,7 +12,7 @@ export const {
     providers: [
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET, // আপনার ভেরসেলের নামের সাথে এটি মিল থাকতে হবে
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
         Credentials({
             name: "Credentials",
@@ -21,16 +21,21 @@ export const {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                const res = await fetch("https://micro-task-server-nine.vercel.app/login", {
-                    method: "POST",
-                    body: JSON.stringify(credentials),
-                    headers: { "Content-Type": "application/json" }
-                })
-                const user = await res.json()
-                if (res.ok && user) {
-                    return user
+                try {
+                    const res = await fetch("https://micro-task-server-nine.vercel.app/login", {
+                        method: "POST",
+                        body: JSON.stringify(credentials),
+                        headers: { "Content-Type": "application/json" }
+                    })
+                    const user = await res.json()
+                    if (res.ok && user) {
+                        return user
+                    }
+                    return null
+                } catch (error) {
+                    console.error("Authorize Error:", error);
+                    return null;
                 }
-                return null
             }
         })
     ],
@@ -43,8 +48,8 @@ export const {
     callbacks: {
         async signIn({ user, account }) {
             if (account.provider === "google") {
-                // কুকি থেকে রোল নেওয়া
-                const cookieStore = cookies();
+                // Next.js App Router এ কুকি পাওয়ার সঠিক নিয়ম
+                const cookieStore = await cookies();
                 const selectedRole = cookieStore.get("user_role")?.value || "worker";
 
                 const userInfo = {
@@ -91,6 +96,5 @@ export const {
             return session;
         }
     },
-    // ভেরসেল সেটিংসে যে নাম দিয়েছেন ঠিক সেই নামটিই এখানে দিন
-    secret: process.env.NEXTAUTH_SECRET, 
+    secret: process.env.NEXTAUTH_SECRET,
 })
