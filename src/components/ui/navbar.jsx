@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="navbar border max-w-[1600px] px-4 mx-auto shadow-sm border-slate-200 dark:border-white/10 rounded-2xl">
         <div className="navbar-start">
           <Link href="/" className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-            MicroTask
+            Loomy
           </Link>
         </div>
 
