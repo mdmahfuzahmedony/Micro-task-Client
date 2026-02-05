@@ -3,20 +3,22 @@ import { ArrowRight, Sparkles, Target } from 'lucide-react';
 
 const HeroSection = () => {
     return (
-        <section className="relative   w-full bg-red-50 dark:bg-slate-950  overflow-hidden transition-colors duration-300">
-            {/* Background Decorative Elements - ডার্ক মোডে সুন্দর আভা দিবে */}
-            <div className="absolute  top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
+        // এখানে w-full ব্যবহার করা হয়েছে যাতে সেকশনটি পুরো স্ক্রিন জুড়ে থাকে
+        <section className="relative w-full border-b border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+            
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 dark:bg-blue-600/10 blur-[120px] rounded-full"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-400/10 dark:bg-purple-600/10 blur-[120px] rounded-full"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[100%] h-[40%] bg-purple-400/10 dark:bg-purple-600/10 blur-[120px] rounded-full"></div>
             </div>
 
-            {/* Container with Max-width 1600px */}
-            <div className="max-w-[1600px] mx-auto  py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12 relative z-10">
+            {/* Container: এটি কন্টেন্টকে ১৬০০ পিক্সেলের মধ্যে রাখবে এবং দুই পাশে প্যাডিং দিবে */}
+            <div className="max-w-[1600px] mx-auto px-6 md:px-12 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12 relative z-10">
 
                 {/* Text Content */}
                 <div className="flex-1 text-center lg:text-left space-y-8">
                     {/* Small Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm font-semibold tracking-wide animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm font-semibold tracking-wide">
                         <Sparkles size={16} />
                         <span>The Best Micro-Tasking Platform</span>
                     </div>
@@ -43,7 +45,7 @@ const HeroSection = () => {
                         </button>
                     </div>
 
-                    {/* Platform Trust Stats (Optional) */}
+                    {/* Platform Trust Stats */}
                     <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 border-t border-slate-100 dark:border-slate-800">
                         <div>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">50k+</p>
@@ -57,15 +59,12 @@ const HeroSection = () => {
                     </div>
                 </div>
 
-                {/* Hero Image/Illustration Placeholder */}
+                {/* Hero Image Section */}
                 <div className="flex-1 w-full max-w-2xl lg:max-w-none">
                     <div className="relative group">
-                        {/* Decorative background for image */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-3xl blur-3xl group-hover:blur-[50px] transition-all duration-500"></div>
 
-                        {/* Image Container */}
                         <div className="relative bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-2xl overflow-hidden aspect-video flex items-center justify-center">
-                            {/* এখানে তুমি তোমার কোনো কাজের স্ক্রিনশট বা ইলস্ট্রেশন দিতে পারো */}
                             <div className="text-center p-12">
                                 <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
                                     <Target size={40} />
@@ -75,8 +74,8 @@ const HeroSection = () => {
                             </div>
                         </div>
 
-                        {/* Floating Badge Example */}
-                        <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hidden sm:flex items-center gap-3 animate-bounce-slow">
+                        {/* Floating Badge */}
+                        <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hidden sm:flex items-center gap-3">
                             <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400">
                                 <ArrowRight size={20} />
                             </div>

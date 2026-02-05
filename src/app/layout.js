@@ -17,8 +17,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "MicroTask - Best Platform",
-  description: "Task and earn easily",
+  title: 'Loomy - Admin Dashboard',
+  description: 'Your awesome blog dashboard',
+  icons: {
+    icon: '/loomy.png', // আপনার ইমেজ যদি public ফোল্ডারে থাকে
+  },
 };
 
 export default function RootLayout({ children }) {
